@@ -18,10 +18,12 @@ class Grid{
         int getx();
         int gety();
         int getcol();
-        
 };
 
-
+// FIX: l[4]/d[4] moved here from every derived class — they were identical
+// duplicates in sq_block, l_block, rl_block, long_block, z_block, rz_block.
+// This is what lets gdown/gright/gleft/check_collision/update/draw be
+// written ONCE instead of six times.
 class Square:public Grid{
     protected:
         std::vector<unsigned int> VBOs;
@@ -29,122 +31,74 @@ class Square:public Grid{
         unsigned int EBO = 0;
         unsigned int element_count = 0;
         std::vector<unsigned int> elements;
+        int l[4], d[4];
 
     public:
-        virtual void draw();
+        void draw();                     // FIX: no longer virtual/overridden per class — identical everywhere
         float set_x_coord(int x);
         float set_y_coord(int x);
         void set_square_coords(int x, int y, int c);
-        virtual void gdown()=0;
         void up_to_gpu(int);
-        virtual void gright()=0;
-        virtual void gleft()=0;
-        virtual void instant_down()=0;
-        virtual void check_collision(int x)=0;
-        void add_vertices(int a, int b, int c);
-        virtual void update() = 0;
-        virtual void rotate() = 0;
+
+        // FIX: these five are now shared, single implementations — no
+        // longer virtual, no longer duplicated per block type.
+        void gdown();
+        void gright();
+        void gleft();
+        void instant_down();
+        void check_collision();          // FIX: no longer takes an int — checks all 4 of its own corners against their own columns
+        void update();
+        void rotate();                   // FIX: shared — checks collision, then defers to shape-specific upd_rot_state()
+
+        // FIX: lock_piece() is new — called once a piece can no longer
+        // fall. Updates floors[]/heights[][] per-column correctly (every
+        // corner, not just 2 hardcoded ones), then checks for and clears
+        // any full rows.
+        void lock_piece();
+
+        virtual void upd_rot_state() = 0; // still per-shape: only real difference between block types now
         int rotation_state = 0;
         bool get_collision();
 };
 
 class sq_block:public Square{
-    protected:
-        int l[4],d[4];
     public:
         sq_block(){}
         sq_block(int x, int y, int z);
-        void draw();
-        void gdown();
-        void gright();
-        void gleft();
-        void instant_down();
-        void check_collision(int x);
-        void update();
-        void rotate();
+        void upd_rot_state(); // empty — a square looks the same at every rotation
 };
 
 class l_block:public Square{
-    protected:
-        int l[4],d[4];
     public:
         l_block(){}
         l_block(int x, int y, int z);
-        void draw();
-        void gdown();
-        void gright();
-        void gleft();
-        void instant_down();
-        void check_collision(int x);
-        void update();
-        void rotate();
         void upd_rot_state();
 };
 
 class rl_block:public Square{
-    protected:
-        int l[4],d[4];
     public:
         rl_block(){}
         rl_block(int x, int y, int z);
-        void draw();
-        void gdown();
-        void gright();
-        void gleft();
-        void instant_down();
-        void check_collision(int x);
-        void update();
-        void rotate();
         void upd_rot_state();
 };
 
 class long_block:public Square{
-    protected:
-        int l[4],d[4];
     public:
         long_block(){}
         long_block(int x, int y, int z);
-        void draw();
-        void gdown();
-        void gright();
-        void gleft();
-        void instant_down();
-        void check_collision(int x);
-        void update();
-        void rotate();
         void upd_rot_state();
 };
 
 class z_block:public Square{
-    protected:
-        int l[4],d[4];
     public:
         z_block(){}
         z_block(int x, int y, int z);
-        void draw();
-        void gdown();
-        void gright();
-        void gleft();
-        void instant_down();
-        void check_collision(int x);
-        void update();
-        void rotate();
         void upd_rot_state();
 };
 
 class rz_block:public Square{
-    protected:
-        int l[4],d[4];
     public:
         rz_block(){}
         rz_block(int x, int y, int z);
-        void draw();
-        void gdown();
-        void gright();
-        void gleft();
-        void instant_down();
-        void check_collision(int x);
-        void update();
-        void rotate();
         void upd_rot_state();
 };

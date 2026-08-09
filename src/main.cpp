@@ -2,6 +2,7 @@
 #include "square.h"
 #include "globals.h"
 
+
 bool input_flag = false;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     input_flag = true;
@@ -92,7 +93,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 int main() {
-
+    srand(static_cast<unsigned int>(time(nullptr)));
     bool equal = false;
 
     enum state Screen = Game;
@@ -133,27 +134,15 @@ int main() {
 
     std::vector<Square*> squares;
     int r = rand() % 6;
-    int x = rand() % (width_boxes - right_wall) + left_wall;
-    int y = rand() % 3 + height_boxes - 1;
+    int x = rand() % (right_wall - left_wall - 3) + left_wall;
+    int y = rand() % 2 + height_boxes - 5;
     switch(r){
-        case 0:
-            squares.push_back(new sq_block(x, y, 0));
-            break;
-        case 1:
-            squares.push_back(new l_block(x, y, 0));
-            break;  
-        case 2:
-            squares.push_back(new rl_block(x, y, 0));
-            break;
-        case 3:
-            squares.push_back(new long_block(x, y, 0));
-            break;
-        case 4:
-            squares.push_back(new z_block(x, y, 0));
-            break;
-        case 5:
-            squares.push_back(new rz_block(x, y, 0));
-            break;
+        case 0: squares.push_back(new sq_block(x, y, r+1)); break;
+        case 1: squares.push_back(new l_block(x, y, r+1)); break;
+        case 2: squares.push_back(new rl_block(x, y, r+1)); break;
+        case 3: squares.push_back(new long_block(x, y, r+1)); break;
+        case 4: squares.push_back(new z_block(x, y, r+1)); break;
+        case 5: squares.push_back(new rz_block(x, y, r+1)); break;
         default:
             cout << "Error in generating random block";
             exit(-1);
@@ -176,43 +165,29 @@ int main() {
         glUseProgram(shader);
 
 
-        if(active -> get_collision()){
-
-            x = rand() % (width_boxes - right_wall) + left_wall;
-            y = rand() % 3 + height_boxes - 3;
+     if(active -> get_collision()){
+            x = rand() % (right_wall - left_wall - 3) + left_wall; 
+            y = rand() % 2 + height_boxes - 5;                       
             r = rand() % 6;
-
             switch(r){
-                case 0:
-                    squares.push_back(new sq_block(x, y, 0));
-                    break;
-                case 1:
-                    squares.push_back(new l_block(x, y, 0));
-                    break;  
-                case 2:
-                    squares.push_back(new rl_block(x, y, 0));
-                    break;
-                case 3:
-                    squares.push_back(new long_block(x, y, 0));
-                    break;
-                case 4:
-                    squares.push_back(new z_block(x, y, 0));
-                    break;
-                case 5:
-                    squares.push_back(new rz_block(x, y, 0));
-                    break;
+                case 0: squares.push_back(new sq_block(x, y, r+1)); break;   
+                case 1: squares.push_back(new l_block(x, y, r+1)); break;
+                case 2: squares.push_back(new rl_block(x, y, r+1)); break;
+                case 3: squares.push_back(new long_block(x, y, r+1)); break;
+                case 4: squares.push_back(new z_block(x, y, r+1)); break;
+                case 5: squares.push_back(new rz_block(x, y, r+1)); break;
                 default:
                     cout << "Error in generating random block";
                     exit(-1);
             }
-            for(int i=0; i<10; i++){
-                if(floors[i] == height_boxes - 1){
-                    cout << "Game Over" << endl;
-                    exit(0);
-                }
-            }
         }
 
+        for(int i=0; i<10; i++){
+            if(floors[i] == height_boxes-4){
+                cout << "Game Over" << endl;
+                exit(0);
+            }
+         }
 
 
         //choose which object is active
