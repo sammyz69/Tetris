@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/Projects-vscode/Tetris/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

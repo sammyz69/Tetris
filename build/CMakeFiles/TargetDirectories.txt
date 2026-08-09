@@ -1,3 +1,0 @@
-C:/Projects-vscode/Tetris/build/CMakeFiles/MyOpenGLApp.dir
-C:/Projects-vscode/Tetris/build/CMakeFiles/edit_cache.dir
-C:/Projects-vscode/Tetris/build/CMakeFiles/rebuild_cache.dir
