@@ -6,8 +6,8 @@
             "type": "shell",
             "command": "cmake",
             "args": [
-                "-S", "${workspaceFolder}",
-                "-B", "${workspaceFolder}/build",
+                "-S", "C:/Projects-vscode/Tetris",
+                "-B", "C:/Projects-vscode/Tetris/build",
                 "-G", "MinGW Makefiles",
                 "-DCMAKE_C_COMPILER=C:/msys64/ucrt64/bin/gcc.exe",
                 "-DCMAKE_CXX_COMPILER=C:/msys64/ucrt64/bin/g++.exe"
@@ -19,7 +19,7 @@
             "type": "shell",
             "command": "cmake",
             "args": [
-                "--build", "${workspaceFolder}/build"
+                "--build", "C:/Projects-vscode/Tetris/build"
             ],
             "dependsOn": "CMake Configure",
             "group": {

@@ -31,6 +31,14 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 # Including HEADERS here makes them show up in IDE project trees (VS/CLion)
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}"
+)
+
 # --- Link libraries ---
 target_link_libraries(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/lib/libglfw3dll.a
@@ -38,18 +46,13 @@ target_link_libraries(${PROJECT_NAME}
     gdi32
 )
 
-
-
-# --- Copy glfw3.dll next to the built exe ---
+# --- Copy runtime files next to the built exe ---
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_SOURCE_DIR}/glfw3.dll
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>
-)
-
-# --- Copy shaders next to the built exe ---
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        "${CMAKE_SOURCE_DIR}/glfw3.dll"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/shaders
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
+        "${CMAKE_SOURCE_DIR}/shaders"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders"
 )

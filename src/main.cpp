@@ -93,6 +93,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 int main() {
 
+    bool equal = false;
 
     enum state Screen = Game;
 
@@ -165,15 +166,22 @@ int main() {
 
     Square* active = squares[0];
     float delta=0, cur, last = 0;
+
+
+
+
     while (!glfwWindowShouldClose(window)) {
         set_background(Screen);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shader);
 
+
         if(active -> get_collision()){
+
             x = rand() % (width_boxes - right_wall) + left_wall;
             y = rand() % 3 + height_boxes - 3;
             r = rand() % 6;
+
             switch(r){
                 case 0:
                     squares.push_back(new sq_block(x, y, 0));
@@ -197,8 +205,15 @@ int main() {
                     cout << "Error in generating random block";
                     exit(-1);
             }
-            
+            for(int i=0; i<10; i++){
+                if(floors[i] == height_boxes - 1){
+                    cout << "Game Over" << endl;
+                    exit(0);
+                }
+            }
         }
+
+
 
         //choose which object is active
         active = squares.back();
@@ -213,7 +228,6 @@ int main() {
         cur = glfwGetTime();
         delta = cur - last;
         if(delta > static_cast<float>(1)/frame_rate){
-
         //falling down
             //std::cout << "  testing    "; 
             for(Square* a : squares){
@@ -226,7 +240,8 @@ int main() {
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && input_flag) {
             active -> gright();
             input_flag = false;
-        } else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && input_flag) {
+        }
+        else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && input_flag) {
             active -> gleft();
             input_flag = false;
         }
@@ -242,10 +257,8 @@ int main() {
 
         glfwSwapBuffers(window);
     }
-
-
-
     glDeleteProgram(shader);
     glfwTerminate();
     return 0;
+    
 }

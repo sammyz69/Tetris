@@ -20,6 +20,7 @@ void sq_block::check_collision(int a){
     {
         if(a == floors[i]){
             collision = true;
+            heights[i][a] = true;
             break;
         }
     }
@@ -27,6 +28,18 @@ void sq_block::check_collision(int a){
     if(collision){
         floors[l[0]-10] = d[2]+1;
         floors[l[1]-10] = d[3]+1;
+        std::cout << "   " << floors[0] << "  " << floors[1] << "  " << floors[2] << "  " << floors[3] << "  " << floors[4] << "  " << floors[5] << "  " << floors[6] << "  " << floors[7] << "  " << floors[8] << "  " << floors[9] << std::endl;
+        for(int i=0; i<20 ;i++)
+        {
+            for(int j=0; j<10; j++){
+                if(heights[j][i]){
+                    std::cout << " 1 ";
+                }
+                else{
+                    std::cout << " 0 ";
+                }
+            }
+        }
     }
 }
 

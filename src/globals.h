@@ -17,3 +17,4 @@ inline float height_sq = static_cast<float> (2) / height_boxes;
 inline float distort;
 
 inline int floors[10] = {0};
+inline bool heights[10][20] = {false};
