@@ -130,25 +130,85 @@ int main() {
     Grid screenGr;
     screenGr.initialize();
 
-    rl_block a(10, 19, 2);
+    std::vector<Square*> squares;
+    int r = rand() % 6;
+    int x = rand() % (width_boxes - right_wall) + left_wall;
+    int y = rand() % 3 + height_boxes - 1;
+    switch(r){
+        case 0:
+            squares.push_back(new sq_block(x, y, 0));
+            break;
+        case 1:
+            squares.push_back(new l_block(x, y, 0));
+            break;  
+        case 2:
+            squares.push_back(new rl_block(x, y, 0));
+            break;
+        case 3:
+            squares.push_back(new long_block(x, y, 0));
+            break;
+        case 4:
+            squares.push_back(new z_block(x, y, 0));
+            break;
+        case 5:
+            squares.push_back(new rz_block(x, y, 0));
+            break;
+        default:
+            cout << "Error in generating random block";
+            exit(-1);
+    }
+
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    Square* ptr;
+
+    Square* active = squares[0];
     float delta=0, cur, last = 0;
     while (!glfwWindowShouldClose(window)) {
         set_background(Screen);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shader);
 
+        if(active -> get_collision()){
+            x = rand() % (width_boxes - right_wall) + left_wall;
+            y = rand() % 3 + height_boxes - 3;
+            r = rand() % 6;
+            switch(r){
+                case 0:
+                    squares.push_back(new sq_block(x, y, 0));
+                    break;
+                case 1:
+                    squares.push_back(new l_block(x, y, 0));
+                    break;  
+                case 2:
+                    squares.push_back(new rl_block(x, y, 0));
+                    break;
+                case 3:
+                    squares.push_back(new long_block(x, y, 0));
+                    break;
+                case 4:
+                    squares.push_back(new z_block(x, y, 0));
+                    break;
+                case 5:
+                    squares.push_back(new rz_block(x, y, 0));
+                    break;
+                default:
+                    cout << "Error in generating random block";
+                    exit(-1);
+            }
+            
+        }
 
         //choose which object is active
-        ptr = &a;
+        active = squares.back();
 
 
         screenGr.grid_draw();
-        ptr -> draw();
+
+        for(Square* a : squares){
+            a -> draw();
+        }
 
         cur = glfwGetTime();
         delta = cur - last;
@@ -156,24 +216,26 @@ int main() {
 
         //falling down
             //std::cout << "  testing    "; 
-            ptr -> gdown();
+            for(Square* a : squares){
+                a -> gdown();
+            }
             last = cur;
         }
         glfwPollEvents();
 
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && input_flag) {
-            ptr -> gright();
+            active -> gright();
             input_flag = false;
         } else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && input_flag) {
-            ptr -> gleft();
+            active -> gleft();
             input_flag = false;
         }
         else if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && input_flag){
-            ptr -> instant_down();
+            active -> instant_down();
             input_flag = false;
         }
         else if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && input_flag){
-            ptr -> rotate();
+            active -> rotate();
             input_flag = false;
         }
 

@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <cstdlib>
 using namespace std;
 
 enum state{

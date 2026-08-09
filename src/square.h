@@ -45,6 +45,7 @@ class Square:public Grid{
         virtual void update() = 0;
         virtual void rotate() = 0;
         int rotation_state = 0;
+        bool get_collision();
 };
 
 class sq_block:public Square{

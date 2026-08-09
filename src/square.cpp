@@ -10,6 +10,10 @@ void sq_block::instant_down(){
     }
 }
 
+bool Square::get_collision(){
+    return collision;
+}
+
 void sq_block::check_collision(int a){
     collision = false;
     for(int i=0; i<10; i++)
