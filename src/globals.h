@@ -18,3 +18,8 @@ inline float distort;
 
 inline int floors[10] = {0};
 inline bool heights[10][20] = {false};
+
+inline int screen = 0;
+
+inline int cursor_xpos = 0;
+inline int cursor_ypos = 0;

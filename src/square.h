@@ -24,21 +24,31 @@ class Grid{
 // duplicates in sq_block, l_block, rl_block, long_block, z_block, rz_block.
 // This is what lets gdown/gright/gleft/check_collision/update/draw be
 // written ONCE instead of six times.
-class Square:public Grid{
+
+class Rect:public Grid{
     protected:
-        std::vector<unsigned int> VBOs;
-        bool collision = false;
         unsigned int EBO = 0;
         unsigned int element_count = 0;
         std::vector<unsigned int> elements;
+        std::vector<unsigned int> VBOs;
+    public:
+
+        Rect(){}
+        void set_rect_coords(int a, int b, int c, float size_width, float size_height);
+        void draw(); 
+        void up_to_gpu(int);
+        int ret(){ 
+            return element_count; }
+};
+class Square:public Rect{
+    protected:
+        bool collision = false;
         int l[4], d[4];
 
-    public:
-        void draw();                     // FIX: no longer virtual/overridden per class — identical everywhere
+    public:                    // FIX: no longer virtual/overridden per class — identical everywhere
         float set_x_coord(int x);
         float set_y_coord(int x);
         void set_square_coords(int x, int y, int c);
-        void up_to_gpu(int);
 
         // FIX: these five are now shared, single implementations — no
         // longer virtual, no longer duplicated per block type.
@@ -48,7 +58,10 @@ class Square:public Grid{
         void instant_down();
         void check_collision();          // FIX: no longer takes an int — checks all 4 of its own corners against their own columns
         void update();
-        void rotate();                   // FIX: shared — checks collision, then defers to shape-specific upd_rot_state()
+        void rotate();    
+        bool is_hovered();
+
+        // FIX: shared — checks collision, then defers to shape-specific upd_rot_state()
 
         // FIX: lock_piece() is new — called once a piece can no longer
         // fall. Updates floors[]/heights[][] per-column correctly (every

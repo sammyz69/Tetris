@@ -115,7 +115,7 @@ void Square::rotate(){
     }
 }
 
-void Square::set_square_coords(int a, int b, int c){
+void Rect::set_rect_coords(int a, int b, int c, float width, float height){
     left_x = a;
     down_y = b;
     col = c;
@@ -133,17 +133,17 @@ void Square::set_square_coords(int a, int b, int c){
     vertices.push_back(n);              
     vertices.push_back(0);
 
-    vertices.push_back(m+width_sq);   
+    vertices.push_back(m+width);   
     vertices.push_back(n);              
     vertices.push_back(0);
 
     vertices.push_back(m);   
-    vertices.push_back(n+height_sq);    
+    vertices.push_back(n+height);    
     vertices.push_back(0);
 
 
-    vertices.push_back(m+width_sq);   
-    vertices.push_back(n+height_sq);    
+    vertices.push_back(m+width);   
+    vertices.push_back(n+height);    
     vertices.push_back(0);
 
     unsigned int base = static_cast<unsigned int>(vertices.size() / 3) - 4;
@@ -153,6 +153,14 @@ void Square::set_square_coords(int a, int b, int c){
     elements.push_back(base + 2);
     elements.push_back(base + 1);
     elements.push_back(base + 3);
+
+    up_to_gpu(c);
+    vertices.resize(0); 
+    elements.resize(0);
+}
+
+void Square::set_square_coords(int a, int b, int c){
+    set_rect_coords(a, b, c, width_sq, height_sq);
 }
 
 void Square::update(){
@@ -164,7 +172,7 @@ void Square::update(){
     up_to_gpu(col);
 }
 
-void Square::up_to_gpu(int c){
+void Rect::up_to_gpu(int c){
     unsigned int vertex_total = static_cast<unsigned int>(vertices.size() / 3);
     std::vector<int> color(vertex_total, c);
 
@@ -252,18 +260,27 @@ void Grid::grid_draw(){
     glBindVertexArray(0);
 }
 
-void Square::draw(){
+bool Square::is_hovered(){
+    int c = cursor_xpos - left_wall;
+    if(c < 0 || c >= 10) return false;
+    for(int i=0; i<4; i++){
+        if(l[i] == cursor_xpos && d[i] == cursor_ypos) return true;
+    }
+    return false;
+}
+
+void Rect::draw(){
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, element_count, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
+
 
 sq_block::sq_block(int a, int b, int c){
     //2 3
     //0 1
     l[0]=a; d[0]=b; l[1]=a+1; d[1]=b; l[2]=a; d[2]=b+1; l[3]=a+1; d[3]=b+1;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
-    up_to_gpu(c);
     vertices.resize(0); elements.resize(0);
 }
 void sq_block::upd_rot_state(){}
@@ -274,7 +291,6 @@ l_block::l_block(int a, int b, int c){
     //0 1
     l[0]=a; d[0]=b; l[1]=a+1; d[1]=b; l[2]=a; d[2]=b+1; l[3]=a; d[3]=b+2;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
-    up_to_gpu(c);
     vertices.resize(0); elements.resize(0);
 }
 void l_block::upd_rot_state(){
@@ -296,7 +312,6 @@ rl_block::rl_block(int a, int b, int c){
     // 0 1
     l[0]=a; d[0]=b; l[1]=a+1; d[1]=b; l[2]=a+1; d[2]=b+1; l[3]=a+1; d[3]=b+2;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
-    up_to_gpu(c);
     vertices.resize(0); elements.resize(0);
 }
 void rl_block::upd_rot_state(){
@@ -318,8 +333,7 @@ long_block::long_block(int a, int b, int c){
     // 1
     // 0
     l[0]=a; d[0]=b; l[1]=a; d[1]=b+1; l[2]=a; d[2]=b+2; l[3]=a; d[3]=b+3;
-    for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
-    up_to_gpu(c);
+    for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);  
     vertices.resize(0); elements.resize(0);
 }
 void long_block::upd_rot_state(){
@@ -340,7 +354,6 @@ z_block::z_block(int a, int b, int c){
     // - 0 1
     l[0]=a+1; d[0]=b; l[1]=a+2; d[1]=b; l[2]=a+1; d[2]=b+1; l[3]=a; d[3]=b+1;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
-    up_to_gpu(c);
     vertices.resize(0); elements.resize(0);
 }
 void z_block::upd_rot_state(){
@@ -361,7 +374,6 @@ rz_block::rz_block(int a, int b, int c){
     // 0 1
     l[0]=a; d[0]=b; l[1]=a+1; d[1]=b; l[2]=a+1; d[2]=b+1; l[3]=a+2; d[3]=b+1;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
-    up_to_gpu(c);
     vertices.resize(0); elements.resize(0);
 }
 void rz_block::upd_rot_state(){
