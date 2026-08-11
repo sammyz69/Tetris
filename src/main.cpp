@@ -211,7 +211,7 @@ int main() {
     std::vector<Square*> squares;
     int r = rand() % 7;
     int x = rand() % (right_wall - left_wall - 3) + left_wall;
-    int y = rand() % 2 + height_boxes - 5;
+    int y = rand() % 2 + height_boxes - 4;
     int c = (2 * rand() + x + y) % 6;
     switch(r){
         case 0: squares.push_back(new sq_block(x, y, c)); break;
