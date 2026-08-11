@@ -1,26 +1,69 @@
 #pragma once
-
+#include <fstream>
 inline int screen_width = 1800;
 inline int screen_height = 1200;
 inline int user_score = 0;
 inline int width_boxes = 30;
 inline int height_boxes = 20;
-inline int frame_rate = 1;
+inline int frame_rate = 10;
+inline int anim_frame_rate = 30;
 
 inline int down_floor = 0;
-inline int left_wall = 10;
+inline int left_wall = 8;
+
+inline int high_scores[3] = {0,0,0};
+inline void load_high_scores(const char* path = "highscores.txt") {
+    std::ifstream f(path);
+    if (!f.is_open()) return;
+    for (int i = 0; i < 3 && f >> high_scores[i]; i++) {}
+}
+
+inline void save_high_scores(const char* path = "highscores.txt") {
+    std::ofstream f(path);
+    if (!f.is_open()) return;
+    for (int i = 0; i < 3; i++) f << high_scores[i] << "\n";
+}
+
+inline bool try_insert_high_score(int score) {
+    if (score <= high_scores[2]) return false;   // not good enough
+    high_scores[2] = score;
+    // simple sort descending
+    if (high_scores[2] > high_scores[1]) std::swap(high_scores[2], high_scores[1]);
+    if (high_scores[1] > high_scores[0]) std::swap(high_scores[1], high_scores[0]);
+    if (high_scores[2] > high_scores[1]) std::swap(high_scores[2], high_scores[1]);
+    save_high_scores();
+    return true;
+}
+
+// right_wall is derived from left_wall (width_boxes - left_wall),
+// so the play width automatically follows left_wall instead of being pinned.
 inline int right_wall = width_boxes - left_wall;
 
-
-inline float width_sq = static_cast<float> (2) / width_boxes;
-inline float height_sq = static_cast<float> (2) / height_boxes;
+inline float width_sq = static_cast<float>(2) / width_boxes;
+inline float height_sq = static_cast<float>(2) / height_boxes;
 inline float distort;
 
-inline int floors[10] = {0};
-inline bool heights[10][20] = {false};
+inline constexpr int MAX_COLS = 30;
+inline constexpr int MAX_ROWS = 30;
+inline int floors[MAX_COLS] = {0};
+
+// board[c][r] == -1 means empty, otherwise holds the color index of the locked block
+inline int board[MAX_COLS][MAX_ROWS];
+
+inline void reset_playfield(){
+    for(int c=0; c<MAX_COLS; c++){
+        floors[c] = 0;
+        for(int r=0; r<MAX_ROWS; r++) board[c][r] = -1;
+    }
+}
+
+inline void set_left_wall(int new_left_wall){
+    left_wall = new_left_wall;
+    right_wall = width_boxes - left_wall;
+    reset_playfield();
+}
 
 inline int screen = 0;
 
 inline int cursor_xpos = 0;
 inline int cursor_ypos = 0;
-
