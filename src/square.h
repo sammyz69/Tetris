@@ -34,7 +34,7 @@ class Rect:public Grid{
     public:
 
         Rect(){}
-        void set_rect_coords(int a, int b, int c, float size_width, float size_height);
+        void set_rect_coords(int a, int b, int c, float size_width, float size_height, bool square);
         void draw(); 
         void up_to_gpu(int);
         int ret(){ 
@@ -113,5 +113,12 @@ class rz_block:public Square{
     public:
         rz_block(){}
         rz_block(int x, int y, int z);
+        void upd_rot_state();
+};
+
+class new_block:public Square{
+    public:
+        new_block(){}
+        new_block(int x, int y, int z);
         void upd_rot_state();
 };

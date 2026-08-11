@@ -111,7 +111,28 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     height_sq = height_boxes / screen_height;
 }
 
-
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods){
+    int cursor;
+    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+        if(screen == 0)
+        {
+            cursor = hovering();
+            if(cursor == 1){
+                glfwSetWindowShouldClose(window, true);
+            }
+            if(cursor == 2)
+            {
+                //high score
+            }
+            if(cursor == 3){
+                //settings
+            }
+            if(cursor == 4){
+                screen = 1;
+            }
+        }
+    }
+}
 
 int main() {
     srand(static_cast<unsigned int>(time(nullptr)));
@@ -150,43 +171,45 @@ int main() {
 
     Rect* background;
     background = new Rect();
-    background -> set_rect_coords(0, 0, 0, 2, 2);
+    background -> set_rect_coords(0, 0, 0, 2, 2, false);
 
     std::vector<Rect*> title_elements;
-    int element_colors = 0;
+    int element_colors = 6;
     auto add_rect = [&](int a, int b, int c, float w, float h, std::vector<Rect*>& elements){
     Rect* r = new Rect();
-    r -> set_rect_coords(a, b, c, w * width_sq, h * height_sq);
+    r -> set_rect_coords(a, b, c, w * width_sq, h * height_sq, false);
     elements.push_back(r);
     };
 
-
-    add_rect(11, 9, element_colors, 8, 2, title_elements);
-    add_rect(10, 7, element_colors, 10, 2, title_elements);
-    add_rect(8, 5, element_colors, 14, 2, title_elements);
     add_rect(12, 3, element_colors, 7, 1, title_elements);
+    add_rect(8, 5, element_colors, 14, 2, title_elements);
+    add_rect(10, 7, element_colors, 10, 2, title_elements);
+    add_rect(11, 9, element_colors, 8, 2, title_elements);
+
+
     
 
 
     Material* bg = new Material("../img/tetris.png");
+    Material* mask = new Material("../img/mask2.png");
+    Material* def = new Material("../img/default.png");
 
     unsigned int game_shader = make_shader("shaders/vertex.txt", "shaders/fragment.txt");
-    unsigned int title_shader = make_shader("shaders/cus_vertex.txt", "shaders/cus_fragment.txt");
-    unsigned int shader = title_shader;
+    unsigned int anim_shader = make_shader("shaders/cus_vertex.txt", "shaders/cus_fragment.txt");
+    unsigned int mask_shader = make_shader("shaders/vertex.txt","shaders/mask-fg.txt");
+    unsigned int shader = anim_shader;
 
     glUseProgram(shader);
     glUniform1i(glGetUniformLocation(shader, "material"), 0);
 
+    glUseProgram(mask_shader);
+    glUniform1i(glGetUniformLocation(mask_shader, "mask"), 0);
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-    //to be removed later
-    glEnable(GL_PROGRAM_POINT_SIZE);
-    glPointSize(10);
-
     std::vector<Square*> squares;
-    int r = rand() % 6;
+    int r = rand() % 7;
     int x = rand() % (right_wall - left_wall - 3) + left_wall;
     int y = rand() % 2 + height_boxes - 5;
     int c = (2 * rand() + x + y) % 6;
@@ -197,6 +220,7 @@ int main() {
         case 3: squares.push_back(new long_block(x, y, c)); break;
         case 4: squares.push_back(new z_block(x, y, c)); break;
         case 5: squares.push_back(new rz_block(x, y, c)); break;
+        case 6: squares.push_back(new new_block(x,y,c)); break;
         default:
             cout << "Error in generating random block";
             exit(-1);
@@ -206,6 +230,7 @@ int main() {
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, cursor_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 
     Square* active = squares[0];
@@ -217,7 +242,6 @@ int main() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        glUseProgram(shader);
         glfwPollEvents();
 
         //0 is title screen
@@ -225,15 +249,12 @@ int main() {
         //2 is settings screen
 
         if(screen == 0){
-            shader = title_shader;
+            shader = anim_shader;
+            glUseProgram(anim_shader);
+
+            
             bg -> use(0);
             background -> draw();
-            glUseProgram(game_shader);
-            screenGr.grid_draw();
-            for(Rect* a:title_elements)
-            {
-                a -> draw();
-            }
 
 
             //0 none
@@ -242,34 +263,27 @@ int main() {
             //3 settings
             //4 start
             cursor = hovering();
-            std::cout << " x " << cursor_xpos << " y " << cursor_ypos << std::endl;
-            switch(cursor){
-                case 1:
-                    std::cout << " exit ";
-                    break;
-                case 2:
-                    std::cout << " highscore ";
-                    break;
-                case 3:
-                    std::cout << " settings ";
-                    break;
-                case 4:
-                    std::cout << " start ";
-                    break;
-                case 0:
-                    break;
-                deafult:
-                    std::cout << "error in determining cursor pos";
-                    return 0;
+
+            glUseProgram(mask_shader);
+
+            for(int i = 0; i<title_elements.size(); i++)
+            {
+                if(cursor != i+1){
+                    glUseProgram(mask_shader);
+                    mask -> use(0);
+                    title_elements[i] -> draw();
+                }
             }
+
         }
         else if(screen == 1){
             shader = game_shader;
+            glUseProgram(shader);
 
         if(active -> get_collision()){
                 x = rand() % (right_wall - left_wall - 3) + left_wall; 
                 y = rand() % 2 + height_boxes - 5;                       
-                r = rand() % 6;
+                r = rand() % 7;
                 c = (rand() * rand() + x) % 6;
                 switch(r){
                     case 0: squares.push_back(new sq_block(x, y, c)); break;   
@@ -278,6 +292,7 @@ int main() {
                     case 3: squares.push_back(new long_block(x, y, c)); break;
                     case 4: squares.push_back(new z_block(x, y, c)); break;
                     case 5: squares.push_back(new rz_block(x, y, c)); break;
+                    case 6: squares.push_back(new new_block(x,y,c)); break;
                     default:
                         cout << "Error in generating random block";
                         exit(-1);

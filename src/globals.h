@@ -23,3 +23,4 @@ inline int screen = 0;
 
 inline int cursor_xpos = 0;
 inline int cursor_ypos = 0;
+

@@ -115,7 +115,7 @@ void Square::rotate(){
     }
 }
 
-void Rect::set_rect_coords(int a, int b, int c, float width, float height){
+void Rect::set_rect_coords(int a, int b, int c, float width, float height, bool sq){
     left_x = a;
     down_y = b;
     col = c;
@@ -154,13 +154,15 @@ void Rect::set_rect_coords(int a, int b, int c, float width, float height){
     elements.push_back(base + 1);
     elements.push_back(base + 3);
 
+    if(!sq){
     up_to_gpu(c);
     vertices.resize(0); 
     elements.resize(0);
+    }
 }
 
 void Square::set_square_coords(int a, int b, int c){
-    set_rect_coords(a, b, c, width_sq, height_sq);
+    set_rect_coords(a, b, c, width_sq, height_sq, true);
 }
 
 void Square::update(){
@@ -282,6 +284,7 @@ sq_block::sq_block(int a, int b, int c){
     l[0]=a; d[0]=b; l[1]=a+1; d[1]=b; l[2]=a; d[2]=b+1; l[3]=a+1; d[3]=b+1;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
     vertices.resize(0); elements.resize(0);
+    up_to_gpu(c);
 }
 void sq_block::upd_rot_state(){}
 
@@ -292,6 +295,7 @@ l_block::l_block(int a, int b, int c){
     l[0]=a; d[0]=b; l[1]=a+1; d[1]=b; l[2]=a; d[2]=b+1; l[3]=a; d[3]=b+2;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
     vertices.resize(0); elements.resize(0);
+        up_to_gpu(c);
 }
 void l_block::upd_rot_state(){
     rotation_state = (rotation_state + 1) % 4;
@@ -313,6 +317,7 @@ rl_block::rl_block(int a, int b, int c){
     l[0]=a; d[0]=b; l[1]=a+1; d[1]=b; l[2]=a+1; d[2]=b+1; l[3]=a+1; d[3]=b+2;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
     vertices.resize(0); elements.resize(0);
+        up_to_gpu(c);
 }
 void rl_block::upd_rot_state(){
     rotation_state = (rotation_state + 1) % 4;
@@ -335,6 +340,7 @@ long_block::long_block(int a, int b, int c){
     l[0]=a; d[0]=b; l[1]=a; d[1]=b+1; l[2]=a; d[2]=b+2; l[3]=a; d[3]=b+3;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);  
     vertices.resize(0); elements.resize(0);
+        up_to_gpu(c);
 }
 void long_block::upd_rot_state(){
     rotation_state = (rotation_state + 1) % 4;
@@ -355,6 +361,7 @@ z_block::z_block(int a, int b, int c){
     l[0]=a+1; d[0]=b; l[1]=a+2; d[1]=b; l[2]=a+1; d[2]=b+1; l[3]=a; d[3]=b+1;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
     vertices.resize(0); elements.resize(0);
+        up_to_gpu(c);
 }
 void z_block::upd_rot_state(){
     rotation_state = (rotation_state + 1) % 4;
@@ -375,6 +382,7 @@ rz_block::rz_block(int a, int b, int c){
     l[0]=a; d[0]=b; l[1]=a+1; d[1]=b; l[2]=a+1; d[2]=b+1; l[3]=a+2; d[3]=b+1;
     for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
     vertices.resize(0); elements.resize(0);
+        up_to_gpu(c);
 }
 void rz_block::upd_rot_state(){
     rotation_state = (rotation_state + 1) % 4;
@@ -386,5 +394,26 @@ void rz_block::upd_rot_state(){
         l[0]-=2; l[1]--; d[1]--; l[3]++; d[3]--;
     } else if(rotation_state == 0){
         d[0]-=2; l[1]++; d[1]--; l[3]++; d[3]++;
+    }
+}
+
+new_block::new_block(int a, int b, int c){
+    // - 2 3
+    // 0 1
+    l[0]=a; d[0]=b; l[1]=a+1; d[1]=b; l[2]=a+1; d[2]=b+1; l[3]=a+2; d[3]=b+1;
+    for(int i=3;i>-1;i--) set_square_coords(l[i],d[i],c);
+    vertices.resize(0); elements.resize(0);
+        up_to_gpu(c);
+}
+void new_block::upd_rot_state(){
+    rotation_state = (rotation_state + 1) % 4;
+    if(rotation_state == 1){
+        l[0]++; d[0]--; l[3]--; d[3]++;
+    } else if(rotation_state == 2){
+        l[0]--; d[0]++; l[3]--; d[3]--;
+    } else if(rotation_state == 3){
+        l[0]++; d[0]+=2; l[1]--; d[1]++; l[3]+=2;
+    } else if(rotation_state == 0){
+        l[0]--; d[0]-=2; l[1]++; d[1]--;
     }
 }
