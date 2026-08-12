@@ -81,7 +81,8 @@ void Square::lock_piece() {
 void Square::gdown() {
     check_collision();
     if (!collision) {
-        for (int i = 0; i < 4; i++) d[i]--;
+        for (int i = 0; i < 4; i++) 
+        {d[i]--;}
         update();
     }
 }

@@ -335,7 +335,7 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, cursor_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
-
+    float sf_drop_cur,sf_drop_last=0;
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwPollEvents();
@@ -431,15 +431,24 @@ int main() {
 
                 // input
                 if (active) {
-                    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && input_flag) {
-                        active->gright();
-                        input_flag = false;
-                    } else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && input_flag) {
-                        active->gleft();
-                        input_flag = false;
-                    } else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && input_flag) {
-                        active->instant_down();
-                        input_flag = false;
+                    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+                            sf_drop_cur = glfwGetTime();
+                            if ((sf_drop_cur - sf_drop_last) > static_cast<float>(1) /(move_rate_inverse)) {
+                            active->gright();
+                            sf_drop_last = sf_drop_cur;
+                    }
+                 }
+                  else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+                        sf_drop_cur = glfwGetTime();
+                            if ((sf_drop_cur - sf_drop_last) > static_cast<float>(1) /(move_rate_inverse)) {
+                            active->gleft();
+                            sf_drop_last = sf_drop_cur;
+                    }} else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+                            sf_drop_cur = glfwGetTime();
+                            if ((sf_drop_cur - sf_drop_last) > static_cast<float>(1) /(drop_rate_inverse)) {
+                            active->gdown();
+                            sf_drop_last = sf_drop_cur;
+                    }
                     } else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && input_flag) {
                         active->rotate();
                         input_flag = false;
