@@ -377,13 +377,21 @@ int main() {
             for (Square* a : squares) a->draw();
 
             glUseProgram(anim_shader);
+            // Score UI kept entirely inside the left wall (x = 0 .. left_wall-1)
+            // so digits never appear as non-collidable white blocks inside the playfield.
             if (score_label) {
                 Rect label;
-                label.set_rect_coords(1, height_boxes - 2, 7, width_sq * 4, height_sq, false);
+                label.set_rect_coords(0, height_boxes - 3, 7, width_sq * 4, height_sq, false);
                 score_label->use(0);
                 label.draw();
             }
-            draw_number(user_score, 6, height_boxes - 2, 1.0f);
+            {
+                // Right-align the number against the left edge of the playfield
+                std::string s = std::to_string(std::max(0, user_score));
+                int nd = static_cast<int>(s.size());
+                int start_x = std::max(0, left_wall - nd);
+                draw_number(user_score, start_x, height_boxes - 2, 1.0f);
+            }
 
             // game-over by height
             bool game_over = false;
