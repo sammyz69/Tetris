@@ -8,6 +8,11 @@ inline int height_boxes = 20;
 inline int frame_rate = 10;
 inline int anim_frame_rate = 30;
 
+// Difficulty gravity speeds (used by the settings screen to set frame_rate)
+inline constexpr int FRAME_RATE_EASY   = 6;
+inline constexpr int FRAME_RATE_MEDIUM = 10;
+inline constexpr int FRAME_RATE_HARD   = 16;
+
 inline int down_floor = 0;
 inline int left_wall = 8;
 
