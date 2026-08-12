@@ -96,12 +96,13 @@ Square* spawn_block() {
     int spawn_range = std::max(1, play_width - 2);
 
     for (int attempt = 0; attempt < 30; ++attempt) {
-        int x = rand() % spawn_range + left_wall + 1;  // +1 keeps it off the wall
+        int x = rand() % spawn_range + left_wall;
         if (x + 2 >= right_wall) x = std::max(left_wall, right_wall - 3);
         int y = height_boxes - 4;
         // Easy difficulty: only square blocks spawn
         int shape = (difficulty == DIFF_EASY) ? 0 : rand() % 7;
         int col = rand() % 6;
+
         Square* p = nullptr;
         switch (shape) {
             case 0: p = new sq_block(x, y, col); break;
@@ -403,7 +404,6 @@ int main() {
                 // lock + spawn
                 if (active->get_collision()) {
                     active->lock_piece();
-                    for (int c = 0; c < right_wall - left_wall; c++)
                     rebuild_static_blocks(static_blocks);
 
                     delete active;
@@ -411,7 +411,6 @@ int main() {
                     active = nullptr;
 
                     Square* next = spawn_block();
-                    
                     if (!next) {
                         clean_game();
                         if (try_insert_high_score(user_score)) screen = 3;
