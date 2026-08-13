@@ -180,13 +180,14 @@ void Rect::set_rect_coords(int a, int b, int c, float width, float height, bool 
     float m = static_cast<float>(a) / width_boxes;
     float n = static_cast<float>(b) / height_boxes;
     m *= 2; n *= 2; m--; n--;
-
+    float w = 0, h = 0;
     VBOs.resize(2);
-
-    vertices.push_back(m);           vertices.push_back(n);           vertices.push_back(0);
-    vertices.push_back(m + width);   vertices.push_back(n);           vertices.push_back(0);
+        w = border_width;
+        h = border_height;
+    vertices.push_back(m);           vertices.push_back(n + h);           vertices.push_back(0);
+    vertices.push_back(m + width - w);   vertices.push_back(n + h);           vertices.push_back(0);
     vertices.push_back(m);           vertices.push_back(n + height);  vertices.push_back(0);
-    vertices.push_back(m + width);   vertices.push_back(n + height);  vertices.push_back(0);
+    vertices.push_back(m + width - w);   vertices.push_back(n + height);  vertices.push_back(0);
 
     unsigned int base = static_cast<unsigned int>(vertices.size() / 3) - 4;
     elements.push_back(base + 0);

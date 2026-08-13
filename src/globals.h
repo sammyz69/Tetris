@@ -10,6 +10,8 @@ inline int anim_frame_rate = 30;
 inline int drop_rate_inverse = 20;
 inline int move_rate_inverse = 13;
 
+
+
 // Difficulty gravity speeds (used by the settings screen to set frame_rate)
 inline constexpr int FRAME_RATE_EASY   = 2;
 inline constexpr int FRAME_RATE_MEDIUM = 1;
@@ -74,3 +76,6 @@ inline int screen = 0;
 
 inline int cursor_xpos = 0;
 inline int cursor_ypos = 0;
+
+inline float border_width = width_sq / 10;
+inline float border_height = height_sq / 10;
