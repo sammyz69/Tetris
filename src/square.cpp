@@ -165,6 +165,24 @@ void Square::rotate() {
             for (int i = 0; i < 4; i++) l[i] -= shift;
         }
     }
+
+    bool out_of_bounds = false;
+    int cols = right_wall - left_wall;
+    for (int i = 0; i < 4; i++) {
+        if (l[i] < left_wall || l[i] >= right_wall) { out_of_bounds = true; break; }
+        if (d[i] < 0 || d[i] >= height_boxes) { out_of_bounds = true; break; }
+        int c = l[i] - left_wall;
+        if (c >= 0 && c < cols && board[c][d[i]] >= 0) { out_of_bounds = true; break; }
+    }
+
+    if (out_of_bounds) {
+        for (int i = 0; i < 4; i++) {
+            l[i] = lastx[i];
+            d[i] = lasty[i];
+        }
+        rotation_state = (rotation_state + 3) % 4;
+    }
+
     update();
 }
 
