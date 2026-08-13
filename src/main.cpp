@@ -6,46 +6,15 @@
 #include <vector>
 #include <string>
 
-Material* digit_tex[10] = {nullptr};
-Material* score_label = nullptr;
-Material* congrats_tex = nullptr;
-
 std::vector<Square*> squares;
 std::vector<Rect*> static_blocks;
 std::vector<Rect*> game_elements;
 Square* active = nullptr;
 
-// ---------------- Settings / difficulty additions ----------------
+
 enum Difficulty { DIFF_EASY, DIFF_MEDIUM, DIFF_HARD };
-Difficulty difficulty = DIFF_MEDIUM; // default: unrestricted shapes, default speed
-// FRAME_RATE_EASY / FRAME_RATE_MEDIUM / FRAME_RATE_HARD now live in globals.h
-
-// colors[] index 8 in vertex.txt is pure black (0,0,0), matching settings.png's
-// background, so masked settings elements blend in the same way title_elements
-// blend into tetris.png using index 6.
+Difficulty difficulty = DIFF_MEDIUM; 
 const int SETTINGS_BG_COLOR = 8;
-// -------------------------------------------------------------------
-
-void draw_number(int value, int grid_x, int grid_y, float scale = 1.0f) {
-    if (value < 0) value = 0;
-    std::string s = std::to_string(value);
-
-    for (size_t i = 0; i < s.size(); i++) {
-        int d = s[i] - '0';
-        if (d < 0 || d > 9 || !digit_tex[d]) continue;
-
-        Rect r;
-        r.set_rect_coords(
-            grid_x + static_cast<int>(i * scale),
-            grid_y,
-            7,
-            width_sq * scale,
-            height_sq * scale,
-            false);
-        digit_tex[d]->use(0);
-        r.draw();
-    }
-}
 
 bool input_flag = false;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -57,7 +26,6 @@ void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
     cursor_ypos = ((screen_height - ypos) / screen_height) * height_boxes;
 }
 
-// Hover regions for the title screen (screen == 0)
 int hovering() {
     if ((cursor_xpos >= 12 && cursor_xpos <= 18) && (cursor_ypos == 3)) return 1; // exit
     if ((cursor_xpos >= 8 && cursor_xpos <= 21) && (cursor_ypos >= 5 && cursor_ypos <= 6)) return 2; // high scores
@@ -66,9 +34,6 @@ int hovering() {
     return 0;
 }
 
-// Click regions for the difficulty options on the settings screen.
-// No hover/mask visuals for these anymore - settings.png / settings1.png / settings2.png
-// each have the corresponding option pre-highlighted, and we just swap textures on click.
 int hit_test_difficulty() {
     if ((cursor_xpos >= 10 && cursor_xpos <= 16) && (cursor_ypos >= 10 && cursor_ypos <= 11)) return 1; // easy
     if ((cursor_xpos >= 9  && cursor_xpos <= 17) && (cursor_ypos >= 7  && cursor_ypos <= 8))  return 2; // medium
@@ -76,8 +41,6 @@ int hit_test_difficulty() {
     return 0;
 }
 
-// Hover region for the settings screen exit X only (widened by one block).
-// Order matches settings_elements: index 0 = exit X -> hover value 1.
 int hovering_settings() {
     if ((cursor_xpos >= 27 && cursor_xpos <= 30) && (cursor_ypos >= 17 && cursor_ypos <= 18)) return 1; // exit X
     return 0;
@@ -99,7 +62,7 @@ Square* spawn_block() {
         int x = rand() % spawn_range + left_wall;
         if (x + 2 >= right_wall) x = std::max(left_wall, right_wall - 3);
         int y = height_boxes - 4;
-        // Easy difficulty: only square blocks spawn
+
         int shape = (difficulty == DIFF_EASY) ? 0 : rand() % 7;
         int col = rand() % 6;
 
@@ -129,12 +92,12 @@ void mouse_button_callback(GLFWwindow* w, int button, int action, int mods) {
         if (h == 1) {
             glfwSetWindowShouldClose(w, true);
         } else if (h == 2) {
-            std::cout << "=== HIGH SCORES ===\n";
+            std::cout << "     HIGH SCORES :    \n";
             for (int i = 0; i < 3; i++)
                 std::cout << (i + 1) << ". " << high_scores[i] << "\n";
-            std::cout << "==================\n";
+            std::cout << ".........................\n";
         } else if (h == 3) {
-            screen = 2; // open settings
+            screen = 2;
         } else if (h == 4) {
             clean_game();
             reset_playfield();
@@ -149,13 +112,13 @@ void mouse_button_callback(GLFWwindow* w, int button, int action, int mods) {
     }
     else if (screen == 2) {
         int d = hit_test_difficulty();
-        if (d == 1) { // Easy
+        if (d == 1) {
             difficulty = DIFF_EASY;
             frame_rate = FRAME_RATE_EASY;
-        } else if (d == 2) { // Medium
+        } else if (d == 2) {
             difficulty = DIFF_MEDIUM;
             frame_rate = FRAME_RATE_MEDIUM;
-        } else if (d == 3) { // Hard
+        } else if (d == 3) {
             difficulty = DIFF_HARD;
             frame_rate = FRAME_RATE_HARD;
         } else if (hovering_settings() == 1) { // X - back to title
@@ -289,19 +252,16 @@ int main() {
     add_rect(10, 7, element_colors, 10, 2, title_elements);
     add_rect(11, 9, element_colors, 8, 2, title_elements);
 
-    // Settings screen: only the exit X still uses the hover/mask reveal trick,
-    // widened by one block. Difficulty options are plain click regions now,
-    // highlighted via texture swap instead (see settings_tex[] below).
-    add_rect(27, 17, SETTINGS_BG_COLOR, 3, 2, settings_elements); // exit X
+    //settigns
+    add_rect(27, 17, SETTINGS_BG_COLOR, 3, 2, settings_elements); 
 
     Material* bg = new Material("../img/tetris.png");
     Material* mask = new Material("../img/mask2.png");
-    // settings_tex[difficulty] - index matches the Difficulty enum order (EASY, MEDIUM, HARD),
-    // each image has the corresponding option pre-highlighted.
+
     Material* settings_tex[3] = {
-        new Material("../img/settings.png"),  // DIFF_EASY highlighted
-        new Material("../img/settings1.png"), // DIFF_MEDIUM highlighted
-        new Material("../img/settings2.png")  // DIFF_HARD highlighted
+        new Material("../img/settings.png"),  
+        new Material("../img/settings1.png"), 
+        new Material("../img/settings2.png")  
     };
 
     unsigned int game_shader = make_shader("shaders/vertex.txt", "shaders/fragment.txt");
@@ -316,17 +276,16 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    for (int i = 0; i < 10; i++) {
-        std::string path = "../img/" + std::to_string(i) + ".png";
-        digit_tex[i] = new Material(path.c_str());
-    }
-    score_label = new Material("../img/score.png");
-    congrats_tex = new Material("../img/congrats.png");
     load_high_scores();
 
     game_elements.clear();
     add_rect(0, 0, 7, left_wall, height_boxes, game_elements);
     add_rect(right_wall, 0, 7, width_boxes - right_wall, height_boxes, game_elements);
+    add_rect(1, 15, 1, 1, 2, game_elements);
+    add_rect(2, 15, 1, 1, 2, game_elements);
+    add_rect(3, 15, 1, 1, 2, game_elements);
+    add_rect(4, 15, 1, 1, 2, game_elements);
+    
 
     float delta = 0, cur = 0, last = 0;
     int cursor = 0;
@@ -355,7 +314,6 @@ int main() {
             }
         }
         else if (screen == 1) {
-            // safety
             if (squares.empty()) {
                 Square* p = spawn_block();
                 if (p) {
@@ -370,30 +328,23 @@ int main() {
             if (!squares.empty())
                 active = squares.back();
 
-            // drawing
+
             glUseProgram(game_shader);
-            for (Rect* a : game_elements) a->draw();
+            int i = 0;
+            for (Rect* a : game_elements) 
+            {
+                if(i>1)
+                {
+                    break;
+                }
+                a->draw();
+                i++;
+            } 
+            i=0;
             for (Rect* a : static_blocks) a->draw();
             for (Square* a : squares) a->draw();
 
-            glUseProgram(anim_shader);
-            // Score UI kept entirely inside the left wall (x = 0 .. left_wall-1)
-            // so digits never appear as non-collidable white blocks inside the playfield.
-            if (score_label) {
-                Rect label;
-                label.set_rect_coords(0, height_boxes - 3, 7, width_sq * 4, height_sq, false);
-                score_label->use(0);
-                label.draw();
-            }
-            {
-                // Right-align the number against the left edge of the playfield
-                std::string s = std::to_string(std::max(0, user_score));
-                int nd = static_cast<int>(s.size());
-                int start_x = std::max(0, left_wall - nd);
-                draw_number(user_score, start_x, height_boxes - 2, 1.0f);
-            }
 
-            // game-over by height
             bool game_over = false;
             int play_width = right_wall - left_wall;
             for (int i = 0; i < play_width; i++) {
@@ -402,6 +353,8 @@ int main() {
                     break;
                 }
             }
+
+    
 
             if (game_over) {
                 clean_game();
@@ -486,13 +439,6 @@ int main() {
             glClear(GL_COLOR_BUFFER_BIT);
 
             glUseProgram(anim_shader);
-            if (congrats_tex) {
-                Rect full;
-                full.set_rect_coords(0, 0, 7, 2.0f, 2.0f, false);
-                congrats_tex->use(0);
-                full.draw();
-            }
-
             if (input_flag) {
                 input_flag = false;
                 screen = 0;
@@ -513,9 +459,6 @@ int main() {
     for (auto* r : settings_elements) delete r;
     for (auto* r : game_elements) delete r;
     delete background;
-    for (int i = 0; i < 10; i++) delete digit_tex[i];
-    delete score_label;
-    delete congrats_tex;
     delete bg;
     delete mask;
     for (Material* m : settings_tex) delete m;
