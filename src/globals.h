@@ -34,7 +34,6 @@ inline void save_high_scores(const char* path = "highscores.txt") {
 inline bool try_insert_high_score(int score) {
     if (score <= high_scores[2]) return false;
     high_scores[2] = score;
-    // simple sort descending
     if (high_scores[2] > high_scores[1]) std::swap(high_scores[2], high_scores[1]);
     if (high_scores[1] > high_scores[0]) std::swap(high_scores[1], high_scores[0]);
     if (high_scores[2] > high_scores[1]) std::swap(high_scores[2], high_scores[1]);
