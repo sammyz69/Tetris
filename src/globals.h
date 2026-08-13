@@ -10,9 +10,6 @@ inline int anim_frame_rate = 30;
 inline int drop_rate_inverse = 20;
 inline int move_rate_inverse = 13;
 
-
-
-// Difficulty gravity speeds (used by the settings screen to set frame_rate)
 inline constexpr int FRAME_RATE_EASY   = 1;
 inline constexpr int FRAME_RATE_MEDIUM = 3;
 inline constexpr int FRAME_RATE_HARD   = 6;
@@ -35,7 +32,7 @@ inline void save_high_scores(const char* path = "highscores.txt") {
 }
 
 inline bool try_insert_high_score(int score) {
-    if (score <= high_scores[2]) return false;   // not good enough
+    if (score <= high_scores[2]) return false;
     high_scores[2] = score;
     // simple sort descending
     if (high_scores[2] > high_scores[1]) std::swap(high_scores[2], high_scores[1]);
@@ -45,8 +42,6 @@ inline bool try_insert_high_score(int score) {
     return true;
 }
 
-// right_wall is derived from left_wall (width_boxes - left_wall),
-// so the play width automatically follows left_wall instead of being pinned.
 inline int right_wall = width_boxes - left_wall;
 
 inline float width_sq = static_cast<float>(2) / width_boxes;
@@ -57,7 +52,6 @@ inline constexpr int MAX_COLS = 30;
 inline constexpr int MAX_ROWS = 30;
 inline int floors[MAX_COLS] = {0};
 
-// board[c][r] == -1 means empty, otherwise holds the color index of the locked block
 inline int board[MAX_COLS][MAX_ROWS];
 
 inline void reset_playfield(){

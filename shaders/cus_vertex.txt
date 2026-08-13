@@ -7,7 +7,6 @@ out vec2 fragmentTexCoord;
 void main()
 {
     gl_Position = vec4(vertexPos, 1.0);
-    // Map NDC [-1,1] -> UV [0,1] with Y flip so texture appears upright
     fragmentTexCoord = vec2(
         (vertexPos.x + 1.0) * 0.5,
         (1.0 - vertexPos.y) * 0.5

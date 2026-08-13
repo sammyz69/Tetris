@@ -121,7 +121,7 @@ void mouse_button_callback(GLFWwindow* w, int button, int action, int mods) {
         } else if (d == 3) {
             difficulty = DIFF_HARD;
             frame_rate = FRAME_RATE_HARD;
-        } else if (hovering_settings() == 1) { // X - back to title
+        } else if (hovering_settings() == 1) {
             screen = 0;
         }
     }
@@ -418,7 +418,6 @@ int main() {
             }
         }
         else if (screen == 2) {
-            // Settings screen - same reveal-on-hover mask trick as the title screen
             glUseProgram(anim_shader);
             settings_tex[difficulty]->use(0);
             background->draw();

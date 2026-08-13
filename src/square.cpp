@@ -337,7 +337,7 @@ void Rect::draw() {
     glBindVertexArray(0);
 }
 
-// -------------------- constructors & rotations --------------------
+
 
 sq_block::sq_block(int a, int b, int c) {
     col = c;
@@ -447,7 +447,8 @@ rz_block::rz_block(int a, int b, int c) {
     col = c;
     l[0] = a;     d[0] = b;
     l[1] = a + 1; d[1] = b;
-    l[2] = a + 1; d[2] = b + 1;
+    l[2] = a + 1; 
+    d[2] = b + 1;
     l[3] = a + 2; d[3] = b + 1;
     for (int i = 3; i > -1; i--) set_square_coords(l[i], d[i], c);
     vertices.resize(0); elements.resize(0);

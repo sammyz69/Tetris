@@ -69,7 +69,7 @@ public:
     bool is_hovered();
     void lock_piece();
 
-    // Returns true if the 4 cells the piece currently occupies are empty
+
     bool is_spawn_position_free() const;
 
     virtual void upd_rot_state() = 0;
